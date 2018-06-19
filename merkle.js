@@ -12,7 +12,7 @@ var REGEXP = {
   'DEFAULT':   "^$"
 };
 
-function Merkle (hashFunc, hashFuncName, useUpperCaseForHash) {
+function Merkle (hashFunc, hashFuncName, useUpperCaseForHash, forceHashLeave) {
 
   var that = this;
 
@@ -33,7 +33,7 @@ function Merkle (hashFunc, hashFuncName, useUpperCaseForHash) {
 
   function feed(anyData) {
     var data = String(anyData);
-    if(data && data.match(that.hashResultRegexp)){
+    if(data && data.match(that.hashResultRegexp) && !forceHashLeave){
       // Push leaf without hashing it since it is already a hash
       that.leaves.push(data);
     }
@@ -224,7 +224,7 @@ function Merkle (hashFunc, hashFuncName, useUpperCaseForHash) {
   return stream;
 }
 
-module.exports = function (hashFuncName, useUpperCaseForHash) {
+module.exports = function (hashFuncName, useUpperCaseForHash, forceHashLeave) {
   return new Merkle(function (input) {
     if (hashFuncName === 'none') {
       return input;
@@ -235,5 +235,7 @@ module.exports = function (hashFuncName, useUpperCaseForHash) {
   }, hashFuncName,
 
   // Use upper case y default
-  useUpperCaseForHash !== false);
+  useUpperCaseForHash !== false,
+  forceHashLeave === true,
+  );
 };
